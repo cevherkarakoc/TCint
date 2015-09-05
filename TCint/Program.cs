@@ -42,7 +42,13 @@ namespace TCint
             Directory.CreateDirectory(targetDir);
 
             foreach (var file in Directory.GetFiles(sourceDir))
-                File.Copy(file, Path.Combine(targetDir, Path.GetFileName(file)));
+            {
+                string fileName = Path.GetFileName(file);
+                if (fileName.Substring(fileName.Length - 3)=="png"){
+                    File.Copy(file, Path.Combine(targetDir, fileName));
+                }                
+            }
+                
         }
     }
 
