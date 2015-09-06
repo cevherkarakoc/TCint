@@ -15,25 +15,33 @@ namespace TCint
 
         static int Main(string[] args)
         {
-            string source,target;
+            string source,target,format="png";
             if (args.Length == 0)
             {
                 return 1;
             }
-            else if (args.Length == 1)
-            {
-                source = args[0];
-                target = args[0] + "(COPY)";
-            }
             else if (args.Length == 2)
             {
                 source = args[0];
-                target = args[1];
+                target = args[0] + "/" + args[1];
+            }
+            else if (args.Length == 3)
+            {
+                source = args[0];
+                target = args[0] + "/"+args[1];
+                if(args[2]=="png" || args[2]=="jpg")
+                {
+                    format = args[2];
+                }
+                else
+                {
+                    return 2;
+                }
             }
             else
-                return 2;
+                return 3;
 
-            copyDir(source, target);
+            copyDir(source, target, format);
 
             return 0;
             
@@ -73,19 +81,40 @@ namespace TCint
             return color;
         }
 
-        static void copyDir(string sourceDir, string targetDir)
+        static void copyDir(string sourceDir, string targetDir, string format)
         {
             Directory.CreateDirectory(targetDir);
 
             foreach (var file in Directory.GetFiles(sourceDir))
             {
                 string fileName = Path.GetFileName(file);
-                if (fileName.Substring(fileName.Length - 3)=="png"){
+                if (fileName.Substring(fileName.Length - 3)== format)
+                {
 
                     Bitmap thisBitmap = new Bitmap(file);
                     string color = averageColor(thisBitmap);
 
-                    File.Copy(file, Path.Combine(targetDir, color+".png"));
+                    try
+                    {
+                        File.Copy(file, Path.Combine(targetDir, color + "." + format));
+                    }
+                    catch
+                    {
+                        int c = 1;
+                        bool ok = false;
+                        while(!ok)
+                        try
+                        {
+                            File.Copy(file, Path.Combine(targetDir, color +"("+ c.ToString()+")" + "." + format));
+                                ok = true;
+                        }
+                        catch
+                        {
+                            c++;
+                        }
+                    }
+
+                    
                 }                
             }
                 
